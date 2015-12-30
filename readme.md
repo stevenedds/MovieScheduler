@@ -4,7 +4,7 @@ Movie Theater Schedule Maker
 
 schmovi.swift is easy to use:
 
-  1) cd into schmovi.swift directory
+  1) cd into the MovieScheduler directory
 
 
   2) make schmovi.swift executable:
@@ -12,7 +12,7 @@ schmovi.swift is easy to use:
       $ chmod +x schmovi.swift
 
 
-  3) add movie times file to the directory
+  3) add your movie times file to the directory
 
 
   4) run schmovi.swift
