@@ -17,7 +17,7 @@ schmove.swift is easy to use:
 
   4) run schove.swift
 
-      $ ./schmove.swift samplemovietimes.txt
+      $ ./schmove.swift sampletimes.txt
 
 
   5) MovieSchedule.txt is created in directory
