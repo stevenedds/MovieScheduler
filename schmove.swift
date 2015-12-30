@@ -103,7 +103,7 @@ func giveTheDay(index: Int, numberOfMovies: Int) -> String? {
   } else if index == numberOfMovies*2 {
     return "Wednesday"
   } else if index == numberOfMovies*3 {
-    return "Thrusday"
+    return "Thursday"
   } else if index == numberOfMovies*4 {
     return "Friday"
   } else if index == numberOfMovies*5 {
