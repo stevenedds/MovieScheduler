@@ -1,13 +1,13 @@
-schmove.swift
+schmovie.swift
 Movie Theater Schedule Maker
 ----------------------------
 
-schmove.swift is easy to use:
+schmovie.swift is easy to use:
 
-  1) cd into schmove.swift directory
+  1) cd into schmovie.swift directory
 
 
-  2) make schmove.swift executable:
+  2) make schmovie.swift executable:
 
       $ chmod +x schmove.swift
 
@@ -15,9 +15,9 @@ schmove.swift is easy to use:
   3) add movie times file to the directory
 
 
-  4) run schove.swift
+  4) run schovie.swift
 
-      $ ./schmove.swift sampletimes.txt
+      $ ./schmovie.swift sampletimes.txt
 
 
   5) MovieSchedule.txt is created in directory
