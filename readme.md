@@ -9,7 +9,7 @@ schmovie.swift is easy to use:
 
   2) make schmovie.swift executable:
 
-      $ chmod +x schmove.swift
+      $ chmod +x schmovie.swift
 
 
   3) add movie times file to the directory
