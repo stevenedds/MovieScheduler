@@ -2,274 +2,252 @@
 
 import Foundation
 
-dump(Process.arguments)
-
 // Properties
-var inputFileName = String()
+struct Hours {
+  var open = Double()
+  var close = Double()
+}
+
+struct Movie {
+  var title = String()
+  var year = Int()
+  var rating = String()
+  var length = String()
+}
+
+var weekDay = Hours()
+weekDay.open  = 11 * 60 + 60
+weekDay.close = 23 * 60
+
+var weekEnd = Hours()
+weekEnd.open  = 10.5 * 60.0 + 60.0
+weekEnd.close = 23.5 * 60
+
+var movies = [Movie]()
 let fileManager = NSFileManager.defaultManager()
 let path = fileManager.currentDirectoryPath
-let outputFileName = "MovieSchedule.txt"
-var inputArray = [String]()
-var titles = [String]()
-var years = [String]()
-var ratings = [String]()
-var lengths = [String]()
-var daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-let weekdayOpen = 11.0 * 60 + 60
-let weekdayClose = 23.0 * 60
-let weekendOpen = 10.5 * 60 + 60
-let weekendClose = 23.5 * 60
-var open = 0.0
-var close = 0.0
+let scheduleFileName = "MovieSchedule.txt"
 
-var schedule = [(title: String, rating: String, length: String, times: [String])]()
+// Functions
+func firstArgument() -> String {
+  let arguments = Process.arguments
+  var inputFileName = String()
+  var count = 0
+  for arg in arguments {
+    if count == 1 {
+      inputFileName = arg
+    } else if count != 0 {
+      print("argument '\(arg)' out of range")
+    }
+    ++count
+  }
+  return inputFileName
+}
 
-// Methods
+func fileFound() -> Bool {
+  let directoryItems = try! fileManager.contentsOfDirectoryAtPath(path)
+  
+  var fileFound = false
+  for item in directoryItems {
+    if firstArgument() == item {
+      fileFound = true
+    }
+  }
+  return fileFound
+}
+
+func inputFileText() {
+
+  let inputFileDirectoryURL = NSURL(fileURLWithPath: path).URLByAppendingPathComponent(firstArgument())
+  var inputFileText = try! String(contentsOfURL: inputFileDirectoryURL, encoding: NSASCIIStringEncoding)
+  inputFileText = inputFileText.stringByReplacingOccurrencesOfString("\n", withString: ", ")
+  let inputArray = inputFileText.componentsSeparatedByString(", ")
+
+  var movie = Movie()
+  
+  
+  var count = 4
+  for _ in 4..<inputArray.count-1 {
+    if count % 4 == 0 {
+      movie.title = inputArray[count]
+    } else if count % 4 == 1 {
+      if let year = Int(inputArray[count]) {
+        movie.year = year
+      }
+    } else if count % 4 == 2 {
+      movie.rating = inputArray[count]
+    } else {
+      movie.length = inputArray[count]
+      movies.append(movie)
+    }
+    ++count
+  }
+}
+
 extension Double {
   var chopped: String {
     return self % 1 == 0 ? String(format: "%.0f", self) : String(self)
   }
 }
 
-func roundToFives(x : Double) -> Double {
-  return 5 * round(x / 5.0)
-}
 
-func amOrpm(isAM: Bool) -> String {
-  if isAM == true {
-    return "am"
-  } else {
-    return "pm"
-  }
-}
-
-
-func convertTimeFromMinutesToStandard(minutes: Double) -> String {
-  var isAM = false
-  if minutes < 720 {
-    isAM = true
-  }
-  var hours = floor(minutes/60)
-  let minutes = minutes%60
-  if hours > 12.0 {
-    hours = hours - 12
+func getMovieTimesAtIndex(index: Int, open: Double, close: Double) -> [String] {
+  
+  func convertHoursToMinutes(time: String) -> Double {
+    let time = time.characters.split(":")
+      .flatMap { Int(String($0)) }
+      .reduce(0) {  $0 * 60 + $1 }
+    return Double(time)
   }
   
-  let hoursString = "\(hours.chopped)"
-  var minutesString = ""
-  
-  if minutes < 10.0 {
-    minutesString = "0\(minutes.chopped)"
-  } else {
-    minutesString = minutes.chopped
-  }
-  return "\(hoursString):\(minutesString)\(amOrpm(isAM))"
-}
-
-
-for arg in Process.arguments {
-  inputFileName = arg
-}
-
-do {
-  let items = try fileManager.contentsOfDirectoryAtPath(path)
-  
-  for item in items {
-    if inputFileName == item {
-      // found file
-      print("file found")
+  func convertTimeFromMinutesToStandard(minutes: Double) -> String {
+    var isAM = false
+    if minutes < 720 {
+      isAM = true
     }
-  }
-} catch {
-  // fail
-}
-
-let inputFileDirectoryURL = NSURL(fileURLWithPath: path).URLByAppendingPathComponent("\(inputFileName)")
-let outputFileDirectoryURL = NSURL(fileURLWithPath: path).URLByAppendingPathComponent("\(outputFileName)")
-
-func formatMovieTimes(times: [String]) -> String {
-  var returnTimes = ""
-  for time in times {
-    returnTimes += "  \(time)\n"
-  }
-  return returnTimes
-}
-
-func giveTheDay(index: Int, numberOfMovies: Int) -> String? {
-  if index == 0 {
-    return "Monday"
-  } else if numberOfMovies == index {
-    return "Tuesday"
-  } else if index == numberOfMovies*2 {
-    return "Wednesday"
-  } else if index == numberOfMovies*3 {
-    return "Thursday"
-  } else if index == numberOfMovies*4 {
-    return "Friday"
-  } else if index == numberOfMovies*5 {
-    return "Saturday"
-  } else if index == numberOfMovies*6 {
-    return "Sunday"
-  } else {
-    return nil
-  }
-}
-
-
-func writeMovieTimesToFile() {
-  do {
-    var filetext = ""
-    
-    let
-    movieCount = schedule.count/7
-    
-    for index in 0..<schedule.count {
-
-      let title = schedule[index].title
-      let rating = schedule[index].rating
-      let length = schedule[index].length
-      let times = formatMovieTimes(schedule[index].times)
-      
-      if let day = giveTheDay(index, numberOfMovies: movieCount) {
-        filetext += "\(day)\n\n"
-      }
-      
-      filetext += "\(title) - Rated \(rating), \(length)\n\(times)\n\n"
+    var hours = floor(minutes/60)
+    let minutes = minutes%60
+    if hours > 12 {
+      hours = hours - 12
     }
+    let hoursString = "\(hours.chopped)"
+    var minutesString = ""
     
-    
-    try filetext.writeToURL(outputFileDirectoryURL, atomically: true, encoding: NSUTF8StringEncoding)
-  }
-  catch { print("could not write to disk") }
-}
-
-
-func sortInputText() {
-  var count = 4
-  for _ in 4..<inputArray.count-1 {
-    if count % 4 == 0 {
-      titles.append(inputArray[count])
-    } else if count % 4 == 1 {
-      years.append(inputArray[count])
-    } else if count % 4 == 2 {
-      ratings.append(inputArray[count])
+    if minutes < 10 {
+      minutesString = "0\(minutes.chopped)"
     } else {
-      lengths.append(inputArray[count])
+      minutesString = minutes.chopped
     }
-    ++count
+    return "\(hoursString):\(minutesString)\(amOrpm(isAM))"
   }
-}
-
-
-func getMovieTimesAtIndex(index: Int) -> (title: String, rating: String, length: String, times: [String]) {
-  var movieTimes = [String]()
-  var lastMoveTime = 0.0
   
-  let title = titles[index]
-  let rating = ratings[index]
-  let length = lengths[index]
-  let movieLength = convertMovieLengthToDouble(length)
+  func amOrpm(isAM: Bool) -> String {
+    if isAM == true {
+      return "am"
+    } else {
+      return "pm"
+    }
+  }
+  
+  func roundToFives(x : Double) -> Double {
+    return 5 * round(x / 5.0)
+  }
+  
+  var movieTimes = [String]()
+  var lastMovieTime = 0.0
+  let length = convertHoursToMinutes(movies[index].length)
   
   var lastMovieStartTime = 0.0
-  
-  repeat {
-    if lastMoveTime == 0.0 {
-      
-      lastMoveTime = roundToFives(close - movieLength)
-      
-      let movieEndTimeDouble = lastMoveTime + movieLength
-      
-  if movieEndTimeDouble > close {
-    lastMoveTime = lastMoveTime-5
-      }
-      lastMovieStartTime = lastMoveTime
-      
-      
-      
-      let movieStartTime = convertTimeFromMinutesToStandard(lastMoveTime)
-      let movieEndTime = convertTimeFromMinutesToStandard(lastMoveTime + movieLength)
 
+
+  repeat {
+    if lastMovieTime == 0.0 {
+      
+      lastMovieTime = roundToFives(close - length)
+      
+      let movieEndTimeDouble = lastMovieTime + length
+      
+      if movieEndTimeDouble > close {
+        lastMovieTime = lastMovieTime-5
+      }
+      lastMovieStartTime = lastMovieTime
+      
+      
+      
+      let movieStartTime = convertTimeFromMinutesToStandard(lastMovieTime)
+      let movieEndTime = convertTimeFromMinutesToStandard(lastMovieTime + length)
+      
       movieTimes.insert("\(movieStartTime) - \(movieEndTime)", atIndex: 0)
       
     } else {
       
-      lastMoveTime = roundToFives(lastMoveTime - movieLength - 35)
+      lastMovieTime = roundToFives(lastMovieTime - length - 35)
       
-      if lastMoveTime + movieLength + 35 > lastMovieStartTime {
-        lastMoveTime = lastMoveTime-5
+      if lastMovieTime + length + 35 > lastMovieStartTime {
+        lastMovieTime = lastMovieTime-5
       }
-
-      lastMovieStartTime = lastMoveTime
       
-      let movieStartTime = convertTimeFromMinutesToStandard(lastMoveTime)
-      let movieEndTime = convertTimeFromMinutesToStandard(lastMoveTime + movieLength)
+      lastMovieStartTime = lastMovieTime
+      
+      let movieStartTime = convertTimeFromMinutesToStandard(lastMovieTime)
+      let movieEndTime = convertTimeFromMinutesToStandard(lastMovieTime + length)
       
       movieTimes.insert("\(movieStartTime) - \(movieEndTime)", atIndex: 0)
     }
-  } while (open) <= (lastMoveTime - movieLength - 35)
-  return (title, rating, length, movieTimes)
+  } while (open) <= (lastMovieTime - length - 35)
+  return movieTimes
 }
 
-func convertMovieLengthToDouble(length: String) -> Double {
-  var hours = 0.0
-  var minutes = 0.0
-  
-  let lengthCleaned = length.stringByReplacingOccurrencesOfString(":", withString: "")
 
-  var count = 0
-  for char in lengthCleaned.characters {
-    if count == 0 {
-      hours = Double("\(char)")! * 60
-    } else if count == 1 {
-      minutes = Double("\(char)")! * 10
-    } else if count == 2 {
-      minutes = Double("\(char)")! + minutes
+func createSchedule() {
+  
+  var scheduleText = ""
+  
+  let daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+  
+  func convertArrayToString(times: [String]) -> String {
+    var timeString = ""
+    for index in 0..<times.count {
+      timeString += "  " + times[index] + "\n"
     }
-    ++count
+    return timeString
   }
-  
-  return hours+minutes
-}
 
-
-func createSchedule() -> [(title: String, rating: String, length: String, times: [String])] {
-  
-  var movieSchedule: [(title: String, rating: String, length: String, times: [String])] = []
-  
   for day in daysOfWeek {
+    
+    let movieTitles = movies.map { $0.title }
+    let movieRatings = movies.map { $0.rating }
+    let movieLengths = movies.map { $0.length }
+    
     switch day {
     case "Monday", "Tuesday", "Wednesday", "Thursday":
-
-      open = weekdayOpen
-      close = weekdayClose
-      for index in 0..<titles.count {
-        movieSchedule.append(getMovieTimesAtIndex(index))
+      scheduleText += day + "\n\n"
+      
+      for index in 0..<movies.count {
+        let movieTimes = getMovieTimesAtIndex(index, open: weekDay.open, close: weekDay.close)
+        let title = movieTitles[index]
+        let rating = movieRatings[index]
+        let length = movieLengths[index]
+        scheduleText += "\(title) - Rated \(rating), \(length)\n\(convertArrayToString(movieTimes))\n"
+        if index == movies.count-1 {
+          scheduleText += "\n"
+        }
       }
       
     case "Friday", "Saturday", "Sunday":
-
-      open = weekendOpen
-      close = weekendClose
-      for index in 0..<titles.count {
-        movieSchedule.append(getMovieTimesAtIndex(index))
+      scheduleText += day + "\n\n"
+      for index in 0..<movies.count {
+        let movieTimes = getMovieTimesAtIndex(index, open: weekEnd.open, close: weekEnd.close)
+        let title = movieTitles[index]
+        let rating = movieRatings[index]
+        let length = movieLengths[index]
+        scheduleText += "\(title) - Rated \(rating), \(length)\n\(convertArrayToString(movieTimes))\n"
+        if index == movies.count-1 {
+          scheduleText += "\n"
+        }
       }
+      
     default: break
     }
   }
-  return movieSchedule
+  let scheduleFileDirectoryURL = NSURL(fileURLWithPath: path).URLByAppendingPathComponent("\(scheduleFileName)")
+  print("writing 'MovieSchedule.txt'")
+  try! scheduleText.writeToURL(scheduleFileDirectoryURL, atomically: true, encoding: NSUTF8StringEncoding)
+  print("MovieSchedule complete")
+
 }
 
 
 
+// Main
 do {
-  var inputFileText = try String(contentsOfURL: inputFileDirectoryURL, encoding: NSASCIIStringEncoding)
-  inputFileText = inputFileText.stringByReplacingOccurrencesOfString("\n", withString: ", ")
-  inputArray = inputFileText.componentsSeparatedByString(", ")
+  if fileFound() {
+    
+    print("'\(firstArgument())' found")
 
-  sortInputText()
-  schedule = createSchedule()
-  writeMovieTimesToFile()
-  
-} catch {
-  // fail
+    inputFileText()
+    createSchedule()
+  } else {
+    print("file '\(firstArgument())' not found")
+  }
 }
