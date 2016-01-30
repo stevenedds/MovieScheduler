@@ -30,3 +30,6 @@ Note:
   * input movie file must be in the same format as sampletimes.txt
   
   * last line of input file must be a return
+
+
+![Demo](https://cloud.githubusercontent.com/assets/11936956/12698175/bf5c57a0-c75b-11e5-8a8a-b5900fb3d19e.png)
