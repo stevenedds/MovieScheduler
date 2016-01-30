@@ -32,4 +32,6 @@ Note:
   * last line of input file must be a return
 
 
+
+Output file looks like this:
 ![Demo](https://cloud.githubusercontent.com/assets/11936956/12698221/c0c209cc-c75c-11e5-952c-a80efc9ed032.png)
