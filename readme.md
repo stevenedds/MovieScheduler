@@ -32,4 +32,4 @@ Note:
   * last line of input file must be a return
 
 
-![Demo](https://cloud.githubusercontent.com/assets/11936956/12698175/bf5c57a0-c75b-11e5-8a8a-b5900fb3d19e.png)
+![Demo](https://cloud.githubusercontent.com/assets/11936956/12698221/c0c209cc-c75c-11e5-952c-a80efc9ed032.png)
